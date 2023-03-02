@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+  <body>
+    <div>
+      <img id="server" width=20 />
+      &nbsp;
+      <img id="client" width=20 />
+    </div>
+    <script>
+      var socket = new WebSocket(`ws://${location.host}/socket`);
+
+      // check if connection to server is established
+      socket.addEventListener('open', function() {
+        var image = document.getElementById('server');
+        image.title = 'اتصال به سرور برقرار است';
+	image.src = '{{ static_url("images/server.png") }}';
+      })
+      
+      // send 'connect' message every one second to server
+      setInterval(() => socket.send("connect"), 1000);
+      
+      // log server message to console
+      socket.addEventListener('message', function(e) {
+        console.log(e.data);
+      });
+      
+      // check if connection to server is gone
+      socket.addEventListener('close', function() {
+	var image = document.getElementById('server');
+	image.title = 'اتصال به سرور قطع شده است';
+	image.src = '{{ static_url("images/nserver.jpg") }}';
+      });
+
+      setInterval(() => {
+	var img = document.getElementById('client');
+        img.src = 'https://th.bing.com/th/id/R.748ee97f66eacc39fb70c484ad234f1e?rik=ARTfmGJCHNjPmw&pid=ImgRaw&r=0'+`?dummy=${Date.now()}`;
+	img.title = 'وضعیت اتصال اینترنت';
+	img.alt = 'Internet Connection Status';
+      }, 5000);
+    </script>
+  </body>
+</html>
